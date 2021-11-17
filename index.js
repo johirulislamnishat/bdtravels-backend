@@ -20,6 +20,8 @@ async function run() {
         const database = client.db('bdtravels_db');
         const travelingData = database.collection('travelData');
 
+        const orders = client.db('bdtravels_db').collection('ordersData')
+
         //GET API
         app.get('/travelData', async (req, res) => {
             const cursor = travelingData.find({});
@@ -43,12 +45,36 @@ async function run() {
             res.json(result)
         });
 
-        //DELETE API
-        app.delete('/travelData/:id', async (req, res) => {
+        //POST ORDERS API
+        app.post('/orders', async (req, res) => {
+            const result = await orders.insertOne(req.body)
+            // console.log(result);
+            res.json(result)
+        });
+
+        //GET ORDERS
+        app.get('/ordersData/:email', async (req, res) => {
+            // const id = req.params.id;
+            // const query = { _id: ObjectId(id) };
+            const result = await orders.find({ email: req.params.email }).toArray();
+            // console.log(result);
+            res.send(result)
+        })
+
+        //GET ALL ORDERS API
+        app.get('/ordersData', async (req, res) => {
+            const cursor = orders.find({});
+            const result = await cursor.toArray();
+            res.send(result)
+        })
+
+        //DELETE ORDER API
+        app.delete('/deleteOrders/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const travels = await travelingData.deleteOne(query);
-            res.send(travels)
+            const result = await orders.deleteOne(query);
+            // console.log(result);
+            res.send(result)
         })
     }
     finally {
